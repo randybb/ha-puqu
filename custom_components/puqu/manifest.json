@@ -1,0 +1,18 @@
+{
+  "domain": "puqu",
+  "name": "PUQU label printer",
+  "bluetooth": [
+    {"local_name": "Q00-*", "connectable": true},
+    {"local_name": "P1L-*", "connectable": true},
+    {"local_name": "PQ*", "connectable": true}
+  ],
+  "codeowners": ["@randybb"],
+  "config_flow": true,
+  "dependencies": ["bluetooth_adapters"],
+  "documentation": "https://github.com/randybb/ha-puqu",
+  "integration_type": "device",
+  "iot_class": "local_polling",
+  "issue_tracker": "https://github.com/randybb/ha-puqu/issues",
+  "requirements": ["Pillow"],
+  "version": "0.1.0"
+}

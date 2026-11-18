@@ -1,0 +1,20 @@
+print:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: puqu
+    image:
+      required: true
+      example: "data:image/png;base64,iVBORw0KGgo..."
+      selector:
+        text:
+          multiline: true
+status:
+  fields:
+    device_id:
+      required: true
+      selector:
+        device:
+          integration: puqu

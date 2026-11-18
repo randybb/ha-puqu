@@ -1,0 +1,44 @@
+{
+  "config": {
+    "step": {
+      "bluetooth_confirm": {
+        "description": "Set up {name}?"
+      },
+      "user": {
+        "data": {
+          "address": "Printer"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "This printer is already set up",
+      "no_devices_found": "No PUQU printer found nearby, is it on?"
+    }
+  },
+  "services": {
+    "print": {
+      "name": "Print",
+      "description": "Prints an image on the label, dark dots printed, at most 384 dots (48 mm) across the printhead, the first row leaves first.",
+      "fields": {
+        "device_id": {
+          "name": "Printer",
+          "description": "The PUQU printer."
+        },
+        "image": {
+          "name": "Image",
+          "description": "PNG or JPEG in base64, also as a data: URL."
+        }
+      }
+    },
+    "status": {
+      "name": "Status",
+      "description": "Asks the printer its state: errors (no labels, cover open, ...), printing, low battery, darkness level.",
+      "fields": {
+        "device_id": {
+          "name": "Printer",
+          "description": "The PUQU printer."
+        }
+      }
+    }
+  }
+}
