@@ -67,8 +67,12 @@ class Printer:
         self.got = asyncio.Event()
         self.coordinator: DataUpdateCoordinator | None = None
 
+    @property
+    def connected(self) -> bool:
+        return self.client is not None and self.client.is_connected
+
     async def connect(self):
-        if self.client is not None and self.client.is_connected:
+        if self.connected:
             return
         ble = bluetooth.async_ble_device_from_address(self.hass, self.address, connectable=True)
         if ble is None:
@@ -192,8 +196,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     printer = Printer(hass, entry)
 
     async def update() -> dict:
-        # One that is not heard is not connected to, it is switched off
-        if not bluetooth.async_address_present(hass, printer.address, connectable=True):
+        # One that is not heard is not connected to, it is switched off. A
+        # connected one is not heard: it stops advertising
+        if not printer.connected and not bluetooth.async_address_present(hass, printer.address, connectable=True):
             await printer.release(always=True)
             raise UpdateFailed(NOT_REACHED)
         try:

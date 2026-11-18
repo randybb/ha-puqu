@@ -1,5 +1,5 @@
 """Connectivity: whether Home Assistant hears the printer, from its Bluetooth
-advertisements, without connecting to it. The others from the state the
+advertisements, without connecting to it, or is connected to it. The others from the state the
 printer told last."""
 
 from __future__ import annotations
@@ -45,17 +45,29 @@ class Flag(CoordinatorEntity, BinarySensorEntity):
         return self._is_on(self.coordinator.data) if self.coordinator.data else None
 
 
-class Connectivity(BinarySensorEntity):
+class Connectivity(CoordinatorEntity, BinarySensorEntity):
     _attr_device_class = BinarySensorDeviceClass.CONNECTIVITY
     _attr_has_entity_name = True
     _attr_should_poll = False
 
     def __init__(self, entry: ConfigEntry) -> None:
+        super().__init__(entry.runtime_data.coordinator)
+        self._printer = entry.runtime_data
         self._address = entry.unique_id
         self._attr_unique_id = f"{entry.unique_id}_connectivity"
         self._attr_device_info = dr.DeviceInfo(connections={(dr.CONNECTION_BLUETOOTH, entry.unique_id)})
 
+    @property
+    def available(self) -> bool:
+        return True
+
+    @property
+    def is_on(self) -> bool:
+        # A connected printer stops advertising
+        return self._attr_is_on or self._printer.connected
+
     async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
         self._attr_is_on = bluetooth.async_address_present(self.hass, self._address, connectable=True)
         self.async_on_remove(bluetooth.async_register_callback(
             self.hass, self._seen, bluetooth.BluetoothCallbackMatcher(address=self._address, connectable=True),
