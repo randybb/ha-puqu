@@ -5,8 +5,9 @@ Bluetooth LE, through the Bluetooth of Home Assistant, so also through ESPHome
 Bluetooth proxies (with `active: true`). The protocol is the one of
 [puquprintJS](https://github.com/MatinxHT/puquprintJS).
 
-Printers are found by their Bluetooth name (`Q00-…`, `P1L-…`) and set up one
-by one. Nothing is polled: the printer is reached only for the two actions,
+Printers are found by their Bluetooth name (`Q00-…`, `P1L-…`) or, as a
+passive scan (e.g. of ESPHome proxies) hears no name, by their service `af30`,
+then named by their address; each is set up on its own. Nothing is polled: the printer is reached only for the two actions,
 so it can switch itself off and its battery lasts.
 
 ## Actions

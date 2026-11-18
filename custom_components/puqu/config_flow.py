@@ -12,11 +12,19 @@ from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from .const import DOMAIN
 
 NAMES = ("Q00-", "P1L-", "PQ")
+# The only thing a passive scan, e.g. of an ESPHome Bluetooth proxy, hears of
+# them: the name comes in the answer to an active scan
+SERVICE = "0000af30-0000-1000-8000-00805f9b34fb"
 
 
-def _title(name: str) -> str:
-    # P1L-243561(BLE) -> P1L-243561
-    return name.removesuffix("(BLE)").strip()
+def _puqu(info: BluetoothServiceInfoBleak) -> bool:
+    return info.name.startswith(NAMES) or SERVICE in info.service_uuids
+
+
+def _title(info: BluetoothServiceInfoBleak) -> str:
+    # P1L-243561(BLE) -> P1L-243561, without a name the address
+    name = info.name.removesuffix("(BLE)").strip()
+    return name if name.startswith(NAMES) else f"PUQU {info.address}"
 
 
 class PuquConfigFlow(ConfigFlow, domain=DOMAIN):
@@ -28,7 +36,7 @@ class PuquConfigFlow(ConfigFlow, domain=DOMAIN):
     async def async_step_bluetooth(self, info: BluetoothServiceInfoBleak) -> ConfigFlowResult:
         await self.async_set_unique_id(info.address)
         self._abort_if_unique_id_configured()
-        self._found = {info.address: _title(info.name)}
+        self._found = {info.address: _title(info)}
         self.context["title_placeholders"] = {"name": self._found[info.address]}
         return await self.async_step_bluetooth_confirm()
 
@@ -46,8 +54,8 @@ class PuquConfigFlow(ConfigFlow, domain=DOMAIN):
             self._abort_if_unique_id_configured()
             return self.async_create_entry(title=self._found[address], data={})
         configured = self._async_current_ids(include_ignore=False)
-        self._found = {info.address: _title(info.name) for info in async_discovered_service_info(self.hass)
-                       if info.name.startswith(NAMES) and info.address not in configured}
+        self._found = {info.address: _title(info) for info in async_discovered_service_info(self.hass)
+                       if _puqu(info) and info.address not in configured}
         if not self._found:
             return self.async_abort(reason="no_devices_found")
         return self.async_show_form(step_id="user", data_schema=vol.Schema({vol.Required("address"): vol.In(

@@ -63,7 +63,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     dr.async_get(hass).async_get_or_create(
         config_entry_id=entry.entry_id,
         connections={(dr.CONNECTION_BLUETOOTH, entry.unique_id)},
-        manufacturer="PUQU", model=entry.title.split("-")[0], name=entry.title)
+        manufacturer="PUQU", name=entry.title)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True
 
