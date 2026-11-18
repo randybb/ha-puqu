@@ -11,7 +11,7 @@ from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 
 from .const import DOMAIN
 
-NAMES = ("Q00-", "P1L-", "PQ")
+NAMES = ("Q00-", "P1L-")
 # The only thing a passive scan, e.g. of an ESPHome Bluetooth proxy, hears of
 # them: the name comes in the answer to an active scan
 SERVICE = "0000af30-0000-1000-8000-00805f9b34fb"

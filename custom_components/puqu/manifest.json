@@ -11,10 +11,6 @@
       "connectable": true
     },
     {
-      "local_name": "PQ*",
-      "connectable": true
-    },
-    {
       "service_uuid": "0000af30-0000-1000-8000-00805f9b34fb",
       "connectable": true
     }
@@ -33,5 +29,5 @@
   "requirements": [
     "Pillow"
   ],
-  "version": "0.1.1"
+  "version": "0.1.2"
 }
