@@ -30,4 +30,11 @@ img = Image.new("1", (400, 3), 1)
 img.putpixel((0, 1), 0)
 rows = image_rows(img)
 assert len(rows[0]) == 384 and rows[1][0] == 1 and sum(map(sum, rows)) == 1
+# Home Assistant refuses name patterns in the first 3 characters, and with
+# them its whole Bluetooth
+import json  # noqa: E402
+
+manifest = json.loads((Path(__file__).parents[1] / "custom_components" / "puqu" / "manifest.json").read_text())
+for matcher in manifest["bluetooth"]:
+    assert not set(matcher.get("local_name", "xxx")[:3]) & set("*?["), matcher
 print("ok")
