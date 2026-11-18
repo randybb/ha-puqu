@@ -2,11 +2,25 @@
   "config": {
     "step": {
       "bluetooth_confirm": {
-        "description": "Set up {name}?"
+        "description": "Set up {name}?",
+        "data": {
+          "scan_interval": "Scan interval",
+          "keep_connection": "Keep connection"
+        },
+        "data_description": {
+          "scan_interval": "How often the state is asked while Home Assistant hears the printer.",
+          "keep_connection": "Keep the Bluetooth connection between the scans (takes a connection slot of the Bluetooth proxy)."
+        }
       },
       "user": {
         "data": {
-          "address": "Printer"
+          "address": "Printer",
+          "scan_interval": "Scan interval",
+          "keep_connection": "Keep connection"
+        },
+        "data_description": {
+          "scan_interval": "How often the state is asked while Home Assistant hears the printer.",
+          "keep_connection": "Keep the Bluetooth connection between the scans (takes a connection slot of the Bluetooth proxy)."
         }
       }
     },
@@ -38,6 +52,44 @@
           "name": "Printer",
           "description": "The PUQU printer."
         }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "scan_interval": "Scan interval",
+          "keep_connection": "Keep connection"
+        },
+        "data_description": {
+          "scan_interval": "How often the state is asked while Home Assistant hears the printer.",
+          "keep_connection": "Keep the Bluetooth connection between the scans (takes a connection slot of the Bluetooth proxy)."
+        }
+      }
+    }
+  },
+  "entity": {
+    "binary_sensor": {
+      "paper": {
+        "name": "Labels out"
+      },
+      "cover": {
+        "name": "Cover"
+      },
+      "battery_low": {
+        "name": "Battery low"
+      },
+      "printing": {
+        "name": "Printing"
+      },
+      "print_error": {
+        "name": "Print error"
+      }
+    },
+    "sensor": {
+      "darkness_level": {
+        "name": "Darkness level"
       }
     }
   }

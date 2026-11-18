@@ -1,5 +1,6 @@
 """Connectivity: whether Home Assistant hears the printer, from its Bluetooth
-advertisements, without connecting to it."""
+advertisements, without connecting to it. The others from the state the
+printer told last."""
 
 from __future__ import annotations
 
@@ -9,10 +10,39 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
+from . import protocol
+
+# Key, device class, whether the flag is on
+STATE = (
+    ("paper", BinarySensorDeviceClass.PROBLEM, lambda s: protocol.ERRORS[protocol.NO_PAPER] in s["errors"]),
+    ("cover", BinarySensorDeviceClass.OPENING, lambda s: protocol.ERRORS[protocol.COVER_OPEN] in s["errors"]),
+    ("battery_low", BinarySensorDeviceClass.BATTERY, lambda s: s["low_battery"]),
+    ("printing", BinarySensorDeviceClass.RUNNING, lambda s: s["printing"]),
+    ("print_error", BinarySensorDeviceClass.PROBLEM,
+     lambda s: bool(set(s["errors"]) - {protocol.ERRORS[protocol.NO_PAPER], protocol.ERRORS[protocol.COVER_OPEN]})),
+)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, add: AddEntitiesCallback) -> None:
-    add([Connectivity(entry)])
+    add([Connectivity(entry), *(Flag(entry, *item) for item in STATE)])
+
+
+class Flag(CoordinatorEntity, BinarySensorEntity):
+    _attr_has_entity_name = True
+
+    def __init__(self, entry: ConfigEntry, key, device_class, is_on) -> None:
+        super().__init__(entry.runtime_data.coordinator)
+        self._is_on = is_on
+        self._attr_translation_key = key
+        self._attr_device_class = device_class
+        self._attr_unique_id = f"{entry.unique_id}_{key}"
+        self._attr_device_info = dr.DeviceInfo(connections={(dr.CONNECTION_BLUETOOTH, entry.unique_id)})
+
+    @property
+    def is_on(self) -> bool | None:
+        return self._is_on(self.coordinator.data) if self.coordinator.data else None
 
 
 class Connectivity(BinarySensorEntity):

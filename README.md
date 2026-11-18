@@ -7,8 +7,31 @@ Bluetooth proxies (with `active: true`). The protocol is the one of
 
 Printers are found by their Bluetooth name (`Q00-…`, `P1L-…`) or, as a
 passive scan (e.g. of ESPHome proxies) hears no name, by their service `af30`,
-then named by their address; each is set up on its own. Nothing is polled: the printer is reached only for the two actions,
-so it can switch itself off and its battery lasts.
+then named by their address; each is set up on its own.
+
+## Options
+
+As in [hass-niimbot](https://github.com/eigger/hass-niimbot), which this
+integration follows:
+
+* **Scan interval** (600 s): how often the state is asked while Home
+  Assistant hears the printer. A printer that is not heard is not connected
+  to, so it can switch itself off.
+* **Keep connection** (off): the Bluetooth connection stays between the
+  scans and the actions. It takes one of the connection slots of a Bluetooth
+  proxy (3 on an ESP32).
+
+## Entities
+
+* **Connectivity**: whether Home Assistant hears the printer, from its
+  advertisements, without connecting.
+* From the state the printer told last: **Labels out**, **Cover**,
+  **Battery low**, **Printing**, **Print error** and **Darkness level**, the
+  darkness set on the printer, coarsely: 0 for 5-7, 1 for 8-10, 2 for 11-13,
+  3 for 14-15.
+
+That is all the printer tells: the details query of puquprintJS (battery
+level, speed, paper type, auto power off) gets no answer from a Q00 or a P1L.
 
 ## Actions
 
@@ -35,10 +58,14 @@ response_variable: printer
 # errors: [], printing: false, low_battery: false, darkness_level: 2
 ```
 
-`darkness_level` is the darkness set on the printer, coarsely: 0 for 5-7,
-1 for 8-10, 2 for 11-13, 3 for 14-15.
-
 [Labelburg](https://github.com/DL6ER/labelburg) designs the labels.
+
+## Thanks
+
+* [puquprintJS](https://github.com/MatinxHT/puquprintJS) for the protocol.
+* [hass-niimbot](https://github.com/eigger/hass-niimbot) for how a label
+  printer on Bluetooth LE fits into Home Assistant: the options, the entities
+  and printing as an action.
 
 ## Tests
 
